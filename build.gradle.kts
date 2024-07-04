@@ -5,6 +5,7 @@ plugins {
 	java
 	id("org.springframework.boot") version "3.2.4"
 	id("io.spring.dependency-management") version "1.1.4"
+	id("io.sentry.jvm.gradle") version "4.3.0"
 	id("checkstyle")
 	id("io.freefair.lombok") version "8.3"
 	jacoco

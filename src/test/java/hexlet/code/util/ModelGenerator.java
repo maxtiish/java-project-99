@@ -1,5 +1,6 @@
 package hexlet.code.util;
 
+import hexlet.code.model.TaskStatus;
 import hexlet.code.model.User;
 import jakarta.annotation.PostConstruct;
 import net.datafaker.Faker;
@@ -15,6 +16,8 @@ import org.springframework.stereotype.Component;
 public class ModelGenerator {
     private Model<User> userModel;
 
+    private Model<TaskStatus> taskStatus;
+
     @Autowired
     private Faker faker;
 
@@ -25,6 +28,12 @@ public class ModelGenerator {
                 .supply(Select.field(User::getEmail), () -> faker.internet().emailAddress())
                 .supply(Select.field(User::getFirstName), () -> faker.name().firstName())
                 .supply(Select.field(User::getLastName), () -> faker.name().lastName())
+                .toModel();
+
+        taskStatus = Instancio.of((TaskStatus.class))
+                .ignore(Select.field(TaskStatus::getId))
+                .supply(Select.field(TaskStatus::getName), () -> faker.name().fullName())
+                .supply(Select.field(TaskStatus::getSlug), () -> faker.internet().slug())
                 .toModel();
     }
 }

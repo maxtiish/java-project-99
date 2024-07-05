@@ -11,8 +11,12 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import hexlet.code.dto.UserCreateDTO;
+import hexlet.code.dto.UserUpdateDTO;
 import hexlet.code.util.ModelGenerator;
 import org.instancio.Instancio;
+import org.junit.jupiter.api.AfterEach;
+import org.openapitools.jackson.nullable.JsonNullable;
 import org.springframework.http.MediaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import hexlet.code.mapper.UserMapper;
@@ -52,8 +56,8 @@ public class UsersControllerTest {
     @Autowired
     private ModelGenerator modelGenerator;
 
-    @Autowired
-    private Faker faker;
+    public static Faker faker = new Faker();
+
     private User testUser;
 
     private JwtRequestPostProcessor token;
@@ -67,16 +71,19 @@ public class UsersControllerTest {
 
         token = jwt().jwt(builder -> builder.subject("hexlet@example.com"));
 
-        testUser = Instancio.of(modelGenerator.getUserModel())
-                .create();
-        repository.save(testUser);
+        testUser = modelGenerator.generateUser();
+    }
+
+    @AfterEach
+    public void clean() {
+        repository.deleteAll();
     }
 
     @Test
     public void testIndex() throws Exception {
         repository.save(testUser);
 
-        var result = mockMvc.perform(get("/users"))
+        var result = mockMvc.perform(get("/api/users").with(jwt()))
                 .andExpect(status().isOk())
                 .andReturn();
         var body = result.getResponse().getContentAsString();
@@ -85,74 +92,67 @@ public class UsersControllerTest {
 
     @Test
     public void testCreate() throws Exception {
-        var dto = userMapper.map(testUser);
+        var dto = new UserCreateDTO();
 
-        var request = post("/users")
+        dto.setEmail(testUser.getEmail());
+        dto.setPassword(testUser.getPassword());
+        dto.setFirstName(testUser.getFirstName());
+        dto.setLastName(testUser.getLastName());
+
+        var request = post("/api/users")
+                .with(token)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(om.writeValueAsString(dto));
 
         mockMvc.perform(request)
                 .andExpect(status().isCreated());
 
-        var user = repository.findById(dto.getId()).get();
+        var user = repository.findByEmail(testUser.getEmail()).orElseThrow();
         assertNotNull(user);
-        assertThat(user.getEmail()).isEqualTo(dto.getUsername());
+        assertThat(user.getFirstName()).isEqualTo(dto.getFirstName());
     }
 
     @Test
     public void testUpdate() throws Exception {
         repository.save(testUser);
 
-        var dto = userMapper.map(testUser);
+        var dto = new UserUpdateDTO();
+        String email = faker.internet().emailAddress();
+        dto.setEmail(JsonNullable.of(email));
 
-        dto.setId(testUser.getId());
-        dto.setUsername(testUser.getEmail());
-        dto.setFirstName(testUser.getFirstName());
-        dto.setLastName(testUser.getLastName());
-
-        var request = put("/users")
+        var request = put("/api/users/" + testUser.getId())
+                .with(token)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(om.writeValueAsString(dto));
+        mockMvc.perform(request).andExpect(status().isOk());
 
-        mockMvc.perform(request)
-                .andExpect(status().isOk());
+        var user = repository.findById(testUser.getId()).orElseThrow();
 
-        var user = repository.findById(testUser.getId()).get();
-
-        assertThat(user.getEmail()).isEqualTo(dto.getUsername());
-        assertThat(user.getFirstName()).isEqualTo(dto.getFirstName());
-        assertThat(user.getLastName()).isEqualTo(dto.getLastName());
-        assertThat(user.getId()).isEqualTo(dto.getId());
+        assertThat(user.getEmail()).isEqualTo(email);
     }
 
     @Test
     public void testShow() throws Exception {
         repository.save(testUser);
 
-        var request = get("/users/" + testUser.getId());
+        var request = get("/api/users/" + testUser.getId()).with(token);
 
         var result = mockMvc.perform(request)
                 .andExpect(status().isOk())
                 .andReturn();
 
-        var user = repository.findById(testUser.getId()).get();
-
         var body = result.getResponse().getContentAsString();
         assertThatJson(body).and(
-                v -> v.node("email").isEqualTo(user.getEmail()),
-                v -> v.node("firstName").isEqualTo(user.getFirstName()),
-                v -> v.node("lastName").isEqualTo(user.getLastName())
+                v -> v.node("firstName").isEqualTo(testUser.getFirstName()),
+                v -> v.node("email").isEqualTo(testUser.getEmail())
         );
     }
 
     @Test
     public void testDelete() throws Exception {
         repository.save(testUser);
-        var request = delete("/users/" + testUser.getId());
-
-        mockMvc.perform(request)
-                .andExpect(status().isNoContent());
-
+        var request = delete("/api/users/" + testUser.getId()).with(token);
+        mockMvc.perform(request).andExpect(status().isNoContent());
         assertThat(repository.existsById(testUser.getId())).isEqualTo(false);
     }
 }

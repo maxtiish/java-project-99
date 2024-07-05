@@ -14,26 +14,26 @@ import org.springframework.stereotype.Component;
 @Getter
 @Component
 public class ModelGenerator {
-    private Model<User> userModel;
+    private static Faker faker = new Faker();
 
-    private Model<TaskStatus> taskStatus;
-
-    @Autowired
-    private Faker faker;
-
-    @PostConstruct
-    private void init() {
-        userModel = Instancio.of(User.class)
+    public static User generateUser() {
+        return Instancio.of(User.class)
                 .ignore(Select.field(User::getId))
+                .ignore(Select.field(User::getCreatedAt))
+                .ignore(Select.field(User::getUpdatedAt))
                 .supply(Select.field(User::getEmail), () -> faker.internet().emailAddress())
                 .supply(Select.field(User::getFirstName), () -> faker.name().firstName())
                 .supply(Select.field(User::getLastName), () -> faker.name().lastName())
-                .toModel();
+                .supply(Select.field(User::getPasswordDigest), () -> faker.internet().password(3, 10))
+                .create();
+    }
 
-        taskStatus = Instancio.of((TaskStatus.class))
+    public static TaskStatus generateTaskStatus() {
+        return Instancio.of((TaskStatus.class))
                 .ignore(Select.field(TaskStatus::getId))
+                .ignore(Select.field(User::getCreatedAt))
                 .supply(Select.field(TaskStatus::getName), () -> faker.name().fullName())
                 .supply(Select.field(TaskStatus::getSlug), () -> faker.internet().slug())
-                .toModel();
+                .create();
     }
 }

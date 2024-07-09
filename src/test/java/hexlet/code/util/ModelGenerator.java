@@ -2,13 +2,10 @@ package hexlet.code.util;
 
 import hexlet.code.model.TaskStatus;
 import hexlet.code.model.User;
-import jakarta.annotation.PostConstruct;
 import net.datafaker.Faker;
 import org.instancio.Instancio;
-import org.instancio.Model;
 import lombok.Getter;
 import org.instancio.Select;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Getter
@@ -31,7 +28,6 @@ public class ModelGenerator {
     public static TaskStatus generateTaskStatus() {
         return Instancio.of((TaskStatus.class))
                 .ignore(Select.field(TaskStatus::getId))
-                .ignore(Select.field(User::getCreatedAt))
                 .supply(Select.field(TaskStatus::getName), () -> faker.name().fullName())
                 .supply(Select.field(TaskStatus::getSlug), () -> faker.internet().slug())
                 .create();

@@ -14,7 +14,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import hexlet.code.dto.UserCreateDTO;
 import hexlet.code.dto.UserUpdateDTO;
 import hexlet.code.util.ModelGenerator;
-import org.instancio.Instancio;
 import org.junit.jupiter.api.AfterEach;
 import org.openapitools.jackson.nullable.JsonNullable;
 import org.springframework.http.MediaType;
@@ -56,7 +55,7 @@ public class UsersControllerTest {
     @Autowired
     private ModelGenerator modelGenerator;
 
-    public static Faker faker = new Faker();
+    private static Faker faker = new Faker();
 
     private User testUser;
 

@@ -52,7 +52,7 @@ public class TaskStatusController {
     @ResponseStatus(HttpStatus.OK)
     public TaskStatusDTO update(@PathVariable Long id, @RequestBody @Valid TaskStatusUpdateDTO dto) {
         var taskStatus = repository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Not Found"));
+                .orElseThrow();
         mapper.update(dto, taskStatus);
         repository.save(taskStatus);
 

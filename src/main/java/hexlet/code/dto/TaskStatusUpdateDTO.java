@@ -9,9 +9,6 @@ import org.openapitools.jackson.nullable.JsonNullable;
 @Setter
 public class TaskStatusUpdateDTO {
     @NotNull
-    private JsonNullable<Long> id;
-
-    @NotNull
     private JsonNullable<String> name;
 
     @NotNull

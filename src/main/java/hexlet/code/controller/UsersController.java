@@ -44,7 +44,7 @@ public class UsersController {
     @ResponseStatus(HttpStatus.OK)
     public UserDTO update(@PathVariable Long id, @RequestBody @Valid UserUpdateDTO dto) {
         var user = repository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Not Found"));
+                .orElseThrow();
         mapper.update(dto, user);
         repository.save(user);
 

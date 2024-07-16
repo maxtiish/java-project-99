@@ -1,5 +1,6 @@
 package hexlet.code.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -14,6 +15,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import static jakarta.persistence.GenerationType.IDENTITY;
 
@@ -30,6 +32,10 @@ public class User implements UserDetails, BaseEntity {
     private String firstName;
 
     private String lastName;
+
+    @OneToMany(mappedBy = "assignee", cascade = CascadeType.ALL)
+    @JsonIgnore
+    private List<Task> tasks = new ArrayList<>();
 
     @Column(unique = true)
     @Email

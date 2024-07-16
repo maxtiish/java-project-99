@@ -4,10 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -16,36 +13,38 @@ import java.time.LocalDate;
 import static jakarta.persistence.GenerationType.IDENTITY;
 
 @Entity
-@Table(name = "task_statuses")
+@Setter
+@Getter
+@Table(name = "tasks")
 @EntityListeners(AuditingEntityListener.class)
 @ToString(includeFieldNames = true, onlyExplicitlyIncluded = true)
-@Getter
-@Setter
-@EqualsAndHashCode
-public class TaskStatus implements BaseEntity {
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+public class Task implements BaseEntity {
     @Id
     @GeneratedValue(strategy = IDENTITY)
     @EqualsAndHashCode.Include
     @ToString.Include
     private Long id;
 
+    @ToString.Include
+    private Integer index;
+
+    @JsonIgnore
+    @ManyToOne(fetch = FetchType.EAGER)
+    private User assignee;
+
     @NotNull
-    @Column(unique = true)
     @ToString.Include
     @Size(min = 1)
     private String name;
 
-    @Column(unique = true)
     @ToString.Include
-    @Size(min = 1)
-    private String slug;
+    private String description;
 
-    @ManyToOne(optional = false)
-    private Task task;
-
-    @ManyToOne(optional = false)
-    @JsonIgnore
-    private User assignee;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @ToString.Include
+    @NotNull
+    private TaskStatus status;
 
     @CreatedDate
     private LocalDate createdAt;

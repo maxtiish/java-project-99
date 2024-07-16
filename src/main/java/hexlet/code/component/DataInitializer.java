@@ -49,6 +49,6 @@ public class DataInitializer implements ApplicationRunner {
         TaskStatus published = new TaskStatus();
         published.setName("Published");
         published.setSlug("published");
-        return List.of(draft,toReview, toBeFixed, toPublish, published);
+        return List.of(draft, toReview, toBeFixed, toPublish, published);
     }
 }

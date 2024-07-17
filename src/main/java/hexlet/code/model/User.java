@@ -33,9 +33,9 @@ public class User implements UserDetails, BaseEntity {
 
     private String lastName;
 
-    @OneToMany(mappedBy = "assignee", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "assignee", cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
     @JsonIgnore
-    private List<Task> tasks = new ArrayList<>();
+    private List<Task> tasks;
 
     @Column(unique = true)
     @Email

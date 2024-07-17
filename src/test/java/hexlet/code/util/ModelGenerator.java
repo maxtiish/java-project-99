@@ -1,5 +1,6 @@
 package hexlet.code.util;
 
+import hexlet.code.model.Label;
 import hexlet.code.model.Task;
 import hexlet.code.model.TaskStatus;
 import hexlet.code.model.User;
@@ -30,7 +31,7 @@ public class ModelGenerator {
         return Instancio.of((TaskStatus.class))
                 .ignore(Select.field(TaskStatus::getId))
                 .supply(Select.field(TaskStatus::getName), () -> faker.lorem().word())
-                .supply(Select.field(TaskStatus::getSlug), () -> faker.internet().slug())
+                .supply(Select.field(TaskStatus::getSlug), () -> faker.lorem().word())
                 .create();
     }
 
@@ -38,11 +39,22 @@ public class ModelGenerator {
         return Instancio.of(Task.class)
                 .ignore(Select.field(Task::getId))
                 .ignore(Select.field(Task::getCreatedAt))
-                .ignore(Select.field(Task::getAssignee))
                 .ignore(Select.field(Task::getStatus))
-                .supply(Select.field(Task::getName), () -> faker.name().title())
-                .supply(Select.field(Task::getDescription), () -> faker.lorem().word())
+                .ignore(Select.field(Task::getAssignee))
+                .ignore(Select.field(Task::getLabels))
+                .supply(Select.field(Task::getName), () -> faker.lorem().word())
+                .supply(Select.field(Task::getDescription), () -> faker.lorem().sentence())
                 .supply(Select.field(Task::getIndex), () -> faker.number().positive())
                 .create();
+    }
+
+    public static Label generateLabel() {
+        return Instancio.of(Label.class)
+                .ignore(Select.field(Label::getId))
+                .ignore(Select.field(Label::getCreatedAt))
+                .ignore(Select.field(Label::getTasks))
+                .supply(Select.field(Label::getName), () -> faker.text().text(3, 1000))
+                .create();
+
     }
 }

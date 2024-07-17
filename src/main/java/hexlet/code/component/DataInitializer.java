@@ -1,5 +1,6 @@
 package hexlet.code.component;
 
+import hexlet.code.model.Label;
 import hexlet.code.model.TaskStatus;
 import hexlet.code.model.User;
 import hexlet.code.repository.UserRepository;
@@ -50,5 +51,15 @@ public class DataInitializer implements ApplicationRunner {
         published.setName("Published");
         published.setSlug("published");
         return List.of(draft, toReview, toBeFixed, toPublish, published);
+    }
+
+    private static List<Label> createLabels() {
+        Label feature = new Label();
+        feature.setName("feature");
+
+        Label bug = new Label();
+        bug.setName("bug");
+
+        return List.of(feature, bug);
     }
 }

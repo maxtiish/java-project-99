@@ -3,7 +3,10 @@ package hexlet.code.model;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.*;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -13,42 +16,27 @@ import java.util.Set;
 import static jakarta.persistence.GenerationType.IDENTITY;
 
 @Entity
-@Setter
 @Getter
-@Table(name = "tasks")
+@Setter
+@Table(name = "labels")
 @EntityListeners(AuditingEntityListener.class)
 @ToString(includeFieldNames = true, onlyExplicitlyIncluded = true)
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-public class Task implements BaseEntity {
+public class Label {
     @Id
     @GeneratedValue(strategy = IDENTITY)
     @EqualsAndHashCode.Include
     @ToString.Include
     private Long id;
 
-    @ToString.Include
-    private Integer index;
-
-    @ToString.Include
-    @ManyToOne(fetch = FetchType.EAGER)
-    private User assignee;
-
     @NotNull
     @ToString.Include
-    @Size(min = 1)
+    @Column(unique = true)
+    @Size(min = 3, max = 1000)
     private String name;
 
-    @ToString.Include
-    private String description;
-
-    @NotNull
-    @ToString.Include
-    @ManyToOne(fetch = FetchType.EAGER)
-    private TaskStatus status;
-
-    @ManyToMany(fetch = FetchType.EAGER)
-    @ToString.Include
-    private Set<Label> labels;
+    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "labels", cascade = CascadeType.MERGE)
+    private Set<Task> tasks;
 
     @CreatedDate
     private LocalDate createdAt;

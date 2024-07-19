@@ -1,5 +1,6 @@
 package hexlet.code.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
@@ -7,8 +8,10 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -23,6 +26,9 @@ import static jakarta.persistence.GenerationType.IDENTITY;
 @Table(name = "users")
 @Getter
 @Setter
+@EntityListeners(AuditingEntityListener.class)
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@ToString(includeFieldNames = true, onlyExplicitlyIncluded = true)
 public class User implements UserDetails, BaseEntity {
     @Id
     @GeneratedValue(strategy = IDENTITY)
@@ -34,7 +40,6 @@ public class User implements UserDetails, BaseEntity {
     private String lastName;
 
     @OneToMany(mappedBy = "assignee", cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
-    @JsonIgnore
     private List<Task> tasks;
 
     @Column(unique = true)

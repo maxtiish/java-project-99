@@ -7,6 +7,7 @@ plugins {
 	id("io.spring.dependency-management") version "1.1.4"
 	id("io.sentry.jvm.gradle") version "4.3.0"
 	id("checkstyle")
+	id("org.springdoc.openapi-gradle-plugin") version "1.9.0"
 	id("io.freefair.lombok") version "8.3"
 	jacoco
 	application
@@ -36,6 +37,9 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-configuration-processor")
 	implementation("org.springframework.boot:spring-boot-starter-security")
 	implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
+	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.6.0")
+	implementation("org.springdoc:springdoc-openapi-starter-webmvc-api:2.6.0")
+	implementation("org.springdoc:springdoc-openapi-starter-webflux-api:2.6.0")
 
 	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0")
 

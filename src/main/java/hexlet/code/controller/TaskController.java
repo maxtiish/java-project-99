@@ -2,12 +2,15 @@ package hexlet.code.controller;
 
 import hexlet.code.dto.task.TaskCreateDTO;
 import hexlet.code.dto.task.TaskDTO;
+import hexlet.code.dto.task.TaskParamsDTO;
 import hexlet.code.dto.task.TaskUpdateDTO;
 import hexlet.code.exception.ResourceNotFoundException;
 import hexlet.code.mapper.TaskMapper;
 import hexlet.code.repository.TaskRepository;
+import hexlet.code.specification.TaskSpecification;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import hexlet.code.utils.UserUtils;
@@ -24,12 +27,16 @@ public class TaskController {
     private TaskRepository repository;
 
     @Autowired
+    private TaskSpecification builder;
+
+    @Autowired
     private TaskMapper mapper;
 
     @GetMapping("/tasks")
     @ResponseStatus(HttpStatus.OK)
-    public List<TaskDTO> index() {
-        var tasks = repository.findAll();
+    public List<TaskDTO> index(TaskParamsDTO params, @RequestParam(defaultValue = "1") int page) {
+        var spec = builder.build(params);
+        var tasks = repository.findAll(spec, PageRequest.of(page - 1, 10));
         return tasks.stream()
                 .map(t -> mapper.map(t))
                 .toList();

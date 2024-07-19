@@ -155,4 +155,22 @@ public class TaskControllerTest {
         mockMvc.perform(request).andExpect(status().isNoContent());
         assertThat(taskRepository.existsById(testTask.getId())).isEqualTo(false);
     }
+
+    @Test
+    public void testParams() throws Exception {
+        var request = get("/api/tasks?titleCont=create&assigneeId=1&status=to_be_fixed&labelId=1");
+        var result = mockMvc.perform(request)
+                .andExpect(status().isOk())
+                .andReturn();
+
+        var body = result.getResponse().getContentAsString();
+        assertThatJson(body).isArray().allSatisfy(el ->
+                assertThatJson(el)
+                        .and(v -> v.node("name").asString().containsIgnoringCase("create"))
+                        .and(v -> v.node("assigneeId").isEqualTo(1))
+                        .and(v -> v.node("labelId").isEqualTo(1))
+                        .and(v -> v.node("status").isEqualTo("to_be_fixed"))
+
+        );
+    }
 }

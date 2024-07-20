@@ -6,20 +6,14 @@ clean:
 build:
 	./gradlew clean build
 
-start:
-	./gradlew bootRun --args='--spring.profiles.active=prod'
-
 install:
 	./gradlew clean install
 
 run-dist:
-    ./build/install/app/bin/app
+	./build/install/java-package/bin/java-package
 
 run:
-    ./gradlew run
-
-lint:
-	./gradlew checkstyleMain checkstyleTest
+	./gradlew run
 
 test:
 	./gradlew test
@@ -27,8 +21,14 @@ test:
 report:
 	./gradlew jacocoTestReport
 
+lint:
+	./gradlew checkstyleMain checkstyleTest
+
 update-deps:
-    ./gradlew useLatestVersions
+	./gradlew useLatestVersions
+
+start:
+	./gradlew bootRun --args='--spring.profiles.active=dev'
 
 build-run: build run
 

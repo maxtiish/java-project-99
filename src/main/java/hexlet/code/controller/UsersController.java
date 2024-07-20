@@ -3,14 +3,20 @@ package hexlet.code.controller;
 import hexlet.code.dto.user.UserCreateDTO;
 import hexlet.code.dto.user.UserDTO;
 import hexlet.code.dto.user.UserUpdateDTO;
-import hexlet.code.exception.ResourceNotFoundException;
-import hexlet.code.mapper.UserMapper;
-import hexlet.code.repository.UserRepository;
+import hexlet.code.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.DeleteMapping;
 
 import java.util.List;
 
@@ -18,52 +24,37 @@ import java.util.List;
 @RequestMapping("/api")
 public class UsersController {
     @Autowired
-    private UserRepository repository;
-
-    @Autowired
-    private UserMapper mapper;
+    private UserService service;
 
     @GetMapping("/users")
     @ResponseStatus(HttpStatus.OK)
     public List<UserDTO> index() {
-        var users = repository.findAll();
-        return users.stream()
-                .map(u -> mapper.map(u))
-                .toList();
+        return service.getAll();
     }
 
     @GetMapping("/users/{id}")
     @ResponseStatus(HttpStatus.OK)
     public UserDTO show(@PathVariable Long id) {
-        var user = repository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("User with id " + id + " not found"));
-        return mapper.map(user);
+        return service.show(id);
     }
 
     @PutMapping("/users/{id}")
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("@userUtils.isSameUser(#id)")
-    public UserDTO update(@PathVariable Long id, @RequestBody @Valid UserUpdateDTO dto) {
-        var user = repository.findById(id)
-                .orElseThrow();
-        mapper.update(dto, user);
-        repository.save(user);
-
-        return mapper.map(user);
+    public UserDTO update(@RequestBody @Valid UserUpdateDTO dto, @PathVariable Long id) {
+        return service.update(dto, id);
     }
 
     @PostMapping("/users")
     @ResponseStatus(HttpStatus.CREATED)
     public UserDTO create(@RequestBody @Valid UserCreateDTO dto) {
-        var user = mapper.map(dto);
-        repository.save(user);
-        return mapper.map(user);
+        return service.create(dto);
     }
 
     @DeleteMapping("/users/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize("@userUtils.isSameUser(#id)")
     public void delete(@PathVariable Long id) {
-        repository.deleteById(id);
+        service.delete(id);
     }
 }

@@ -158,7 +158,7 @@ public class TaskControllerTest {
 
     @Test
     public void testParams() throws Exception {
-        var request = get("/api/tasks?titleCont=create&assigneeId=1&status=to_be_fixed&labelId=1");
+        var request = get("/api/tasks?titleCont=create&assigneeId=1&status=to_be_fixed&labelId=1").with(token);
         var result = mockMvc.perform(request)
                 .andExpect(status().isOk())
                 .andReturn();
@@ -170,7 +170,6 @@ public class TaskControllerTest {
                         .and(v -> v.node("assigneeId").isEqualTo(1))
                         .and(v -> v.node("labelId").isEqualTo(1))
                         .and(v -> v.node("status").isEqualTo("to_be_fixed"))
-
         );
     }
 }

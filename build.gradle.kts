@@ -5,10 +5,10 @@ plugins {
 	java
 	id("org.springframework.boot") version "3.2.4"
 	id("io.spring.dependency-management") version "1.1.4"
-	id("io.sentry.jvm.gradle") version "4.3.0"
 	id("checkstyle")
 	id("org.springdoc.openapi-gradle-plugin") version "1.9.0"
 	id("io.freefair.lombok") version "8.3"
+	id("io.sentry.jvm.gradle") version "4.10.0"
 	jacoco
 	application
 }
@@ -63,8 +63,6 @@ tasks.test {
 	testLogging {
 		exceptionFormat = TestExceptionFormat.FULL
 		events = mutableSetOf(TestLogEvent.FAILED, TestLogEvent.PASSED, TestLogEvent.SKIPPED)
-		// showStackTraces = true
-		// showCauses = true
 		showStandardStreams = true
 	}
 }
@@ -73,4 +71,16 @@ tasks.jacocoTestReport {
 	reports {
 		xml.required.set(true)
 	}
+
+tasks.sentryBundleSourcesJava {
+	enabled = System.getenv("SENTRY_AUTH_TOKEN") != null
+}
+
+sentry {
+	includeSourceContext = true
+
+	org = "maxtiish"
+	projectName = "java-spring-boot"
+	authToken = System.getenv("SENTRY_AUTH_TOKEN")
+}
 }

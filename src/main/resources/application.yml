@@ -1,3 +1,10 @@
+logging:
+  level:
+    root: WARN
+    org:
+      springframework:
+        security: DEBUG
+
 spring:
   jpa:
     show-sql: true
@@ -7,3 +14,7 @@ spring:
 rsa:
   private-key: classpath:certs/private.pem
   public-key: classpath:certs/public.pem
+
+  sentry:
+    dsn: https://db8701394b8d7134cebecc8bff22b229@o4507635835666432.ingest.de.sentry.io/4507636270497872
+    traces-sample-rate: 1.0

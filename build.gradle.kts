@@ -7,7 +7,6 @@ plugins {
 	id("io.spring.dependency-management") version "1.1.4"
 	id("checkstyle")
 	id("org.springdoc.openapi-gradle-plugin") version "1.9.0"
-	id("io.freefair.lombok") version "8.3"
 	id("io.sentry.jvm.gradle") version "4.10.0"
 	jacoco
 	application
@@ -40,9 +39,12 @@ dependencies {
 	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.6.0")
 	implementation("org.springdoc:springdoc-openapi-starter-webmvc-api:2.6.0")
 	implementation("org.springdoc:springdoc-openapi-starter-webflux-api:2.6.0")
-
 	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0")
+	compileOnly("org.projectlombok:lombok:1.18.34")
+	annotationProcessor("org.projectlombok:lombok:1.18.34")
 
+	testCompileOnly("org.projectlombok:lombok:1.18.34")
+	testAnnotationProcessor("org.projectlombok:lombok:1.18.34")
 	implementation("org.openapitools:jackson-databind-nullable:0.2.6")
 	implementation("org.mapstruct:mapstruct:1.6.0.Beta1")
 	annotationProcessor("org.mapstruct:mapstruct-processor:1.6.0.Beta1")
@@ -71,6 +73,7 @@ tasks.jacocoTestReport {
 	reports {
 		xml.required.set(true)
 	}
+}
 
 tasks.sentryBundleSourcesJava {
 	enabled = System.getenv("SENTRY_AUTH_TOKEN") != null
@@ -82,5 +85,4 @@ sentry {
 	org = "maxtiish"
 	projectName = "java-spring-boot"
 	authToken = System.getenv("SENTRY_AUTH_TOKEN")
-}
 }

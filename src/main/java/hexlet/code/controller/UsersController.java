@@ -4,6 +4,7 @@ import hexlet.code.dto.user.UserCreateDTO;
 import hexlet.code.dto.user.UserDTO;
 import hexlet.code.dto.user.UserUpdateDTO;
 import hexlet.code.service.UserService;
+import hexlet.code.utils.UserUtils;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -26,6 +27,9 @@ public class UsersController {
     @Autowired
     private UserService service;
 
+    @Autowired
+    private UserUtils userUtils;
+
     @GetMapping("/users")
     @ResponseStatus(HttpStatus.OK)
     public List<UserDTO> index() {
@@ -40,7 +44,7 @@ public class UsersController {
 
     @PutMapping("/users/{id}")
     @ResponseStatus(HttpStatus.OK)
-    @PreAuthorize("@userUtils.isSameUser(#id)")
+    @PreAuthorize("")
     public UserDTO update(@RequestBody @Valid UserUpdateDTO dto, @PathVariable Long id) {
         return service.update(dto, id);
     }
@@ -53,7 +57,7 @@ public class UsersController {
 
     @DeleteMapping("/users/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @PreAuthorize("@userUtils.isSameUser(#id)")
+    @PreAuthorize("@userUtils.getCurrentUser().getId() == #id")
     public void delete(@PathVariable Long id) {
         service.delete(id);
     }

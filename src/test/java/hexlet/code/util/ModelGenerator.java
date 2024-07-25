@@ -37,7 +37,6 @@ public class ModelGenerator {
     public static Task generateTask() {
         return Instancio.of(Task.class)
                 .ignore(Select.field(Task::getId))
-                .ignore(Select.field(Task::getCreatedAt))
                 .ignore(Select.field(Task::getStatus))
                 .ignore(Select.field(Task::getAssignee))
                 .ignore(Select.field(Task::getLabels))
@@ -50,7 +49,6 @@ public class ModelGenerator {
     public static Label generateLabel() {
         return Instancio.of(Label.class)
                 .ignore(Select.field(Label::getId))
-                .ignore(Select.field(Label::getCreatedAt))
                 .supply(Select.field(Label::getName), () -> faker.text().text(3, 1000))
                 .create();
 

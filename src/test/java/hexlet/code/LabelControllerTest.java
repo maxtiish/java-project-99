@@ -112,11 +112,15 @@ public class LabelControllerTest {
                 .with(token)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(om.writeValueAsString(dto));
-        mockMvc.perform(request).andExpect(status().isCreated());
+        var result = mockMvc.perform(request).andExpect(status().isCreated()).andReturn();
+
+        var body = result.getResponse().getContentAsString();
 
         var label = repository.findByName(testLabel.getName()).orElseThrow();
         assertNotNull(label);
         assertThat(label.getName()).isEqualTo(dto.getName());
+        assertThatJson(body).and(
+                v -> v.node("createdAt").isPresent());
     }
 
     @Test

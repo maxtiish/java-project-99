@@ -63,11 +63,11 @@ public class User implements UserDetails, BaseEntity {
         return true;
     }
 
-    @CreatedDate
-    private LocalDate createdAt;
-
     @LastModifiedDate
     private LocalDate updatedAt;
+
+    @CreatedDate
+    private LocalDate createdAt;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

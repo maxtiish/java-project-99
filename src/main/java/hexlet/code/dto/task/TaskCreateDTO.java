@@ -6,6 +6,8 @@ import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDate;
+
 @Getter
 @Setter
 public class TaskCreateDTO {
@@ -22,4 +24,6 @@ public class TaskCreateDTO {
     private String name;
 
     private String description;
+
+    private LocalDate createdAt;
 }

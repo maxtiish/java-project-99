@@ -6,6 +6,8 @@ import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDate;
+
 @Getter
 @Setter
 public class TaskStatusCreateDTO {
@@ -16,4 +18,6 @@ public class TaskStatusCreateDTO {
     @Column(unique = true)
     @NotBlank
     private String slug;
+
+    private LocalDate createdAt;
 }

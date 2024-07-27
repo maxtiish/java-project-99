@@ -37,7 +37,7 @@ public class ModelGenerator {
     public static Task generateTask() {
         return Instancio.of(Task.class)
                 .ignore(Select.field(Task::getId))
-                .ignore(Select.field(Task::getStatus))
+                .ignore(Select.field(Task::getTaskStatus))
                 .ignore(Select.field(Task::getAssignee))
                 .ignore(Select.field(Task::getLabels))
                 .supply(Select.field(Task::getName), () -> faker.lorem().word())

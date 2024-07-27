@@ -79,7 +79,7 @@ public class TaskControllerTest {
         testTask = modelGenerator.generateTask();
 
         testTask.setAssignee(user);
-        testTask.setStatus(status);
+        testTask.setTaskStatus(status);
     }
 
     @AfterEach

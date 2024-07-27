@@ -4,6 +4,9 @@ import hexlet.code.model.TaskStatus;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import java.time.LocalDate;
 
 @Getter
@@ -20,6 +23,8 @@ public class TaskDTO {
     private String description;
 
     private TaskStatus status;
+
+    private Set<Long> taskLabelIds = new HashSet<>();
 
     private LocalDate createdAt;
 }

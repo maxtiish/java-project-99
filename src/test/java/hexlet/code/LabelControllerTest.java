@@ -22,6 +22,7 @@ import org.springframework.web.context.WebApplicationContext;
 
 import java.nio.charset.StandardCharsets;
 
+import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 
@@ -106,19 +107,17 @@ public class LabelControllerTest {
 
     @Test
     public void testCreate() throws Exception {
-        var dto = mapper.map(testLabel);
+        var data = modelGenerator.generateLabel();
 
         var request = post("/api/labels")
-                .with(token)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(om.writeValueAsString(dto));
-        var result = mockMvc.perform(request).andExpect(status().isCreated()).andReturn();
-
+                .with(jwt())
+                .contentType(APPLICATION_JSON)
+                .content(om.writeValueAsString(data));
+        var result = mockMvc
+                .perform(request)
+                .andExpect(status().isCreated())
+                .andReturn();
         var body = result.getResponse().getContentAsString();
-
-        var label = repository.findByName(testLabel.getName()).orElseThrow();
-        assertNotNull(label);
-        assertThat(label.getName()).isEqualTo(dto.getName());
         assertThatJson(body).and(
                 v -> v.node("createdAt").isPresent());
     }

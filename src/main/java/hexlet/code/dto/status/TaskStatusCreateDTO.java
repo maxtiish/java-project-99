@@ -5,11 +5,13 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.experimental.Accessors;
 
 import java.time.LocalDate;
 
 @Getter
 @Setter
+@Accessors(fluent = true, chain = true)
 public class TaskStatusCreateDTO {
     @NotBlank
     @Size(min = 1)

@@ -3,7 +3,6 @@ package hexlet.code.service;
 import hexlet.code.dto.label.LabelCreateDTO;
 import hexlet.code.dto.label.LabelDTO;
 import hexlet.code.dto.label.LabelUpdateDTO;
-import hexlet.code.exception.ResourceNotFoundException;
 import hexlet.code.mapper.LabelMapper;
 import hexlet.code.repository.LabelRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,15 +24,15 @@ public class LabelService {
                 .toList();
     }
 
-    public LabelDTO show(Long id) {
+    public LabelDTO getById(Long id) {
         var label = repository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Label with id " + id + " not found"));
+                .orElseThrow();
         return mapper.map(label);
     }
 
     public LabelDTO update(LabelUpdateDTO dto, Long id) {
         var label = repository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Label with id " + id + " not found"));
+                .orElseThrow();
         mapper.update(dto, label);
         repository.save(label);
         return mapper.map(label);

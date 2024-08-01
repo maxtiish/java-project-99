@@ -27,14 +27,14 @@ public class TaskStatusController {
 
     @GetMapping("/task_statuses")
     @ResponseStatus(HttpStatus.OK)
-    public List<TaskStatusDTO> index() {
+    public List<TaskStatusDTO> getAll() {
         return service.getAll();
     }
 
     @GetMapping("/task_statuses/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public TaskStatusDTO show(@PathVariable Long id) {
-        return service.show(id);
+    public TaskStatusDTO getById(@PathVariable Long id) {
+        return service.getById(id);
     }
 
     @PostMapping("/task_statuses")

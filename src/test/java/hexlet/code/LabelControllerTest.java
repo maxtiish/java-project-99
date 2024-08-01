@@ -1,6 +1,7 @@
 package hexlet.code;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import hexlet.code.dto.label.LabelCreateDTO;
 import hexlet.code.dto.label.LabelUpdateDTO;
 import hexlet.code.mapper.LabelMapper;
 import hexlet.code.model.Label;
@@ -17,14 +18,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
-
-import java.nio.charset.StandardCharsets;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
-import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -47,9 +44,6 @@ public class LabelControllerTest {
     private ObjectMapper om;
 
     @Autowired
-    private ModelGenerator modelGenerator;
-
-    @Autowired
     private LabelRepository repository;
 
     @Autowired
@@ -58,17 +52,12 @@ public class LabelControllerTest {
     private Label testLabel;
 
     private SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor token;
-
+    private ModelGenerator modelGenerator = new ModelGenerator();
     private static Faker faker = new Faker();
 
     @BeforeEach
     public void setUp() {
         testLabel = modelGenerator.generateLabel();
-
-        mockMvc = MockMvcBuilders.webAppContextSetup(wac)
-                .defaultResponseCharacterEncoding(StandardCharsets.UTF_8)
-                .apply(springSecurity())
-                .build();
 
         token = jwt().jwt(builder -> builder.subject("hexlet@example.com"));
     }
@@ -79,7 +68,7 @@ public class LabelControllerTest {
     }
 
     @Test
-    public void testIndex() throws Exception {
+    public void testGetAll() throws Exception {
         repository.save(testLabel);
         var result = mockMvc.perform(get("/api/labels").with(jwt()))
                 .andExpect(status().isOk())
@@ -89,7 +78,7 @@ public class LabelControllerTest {
     }
 
     @Test
-    public void testShow() throws Exception {
+    public void testGetById() throws Exception {
         repository.save(testLabel);
 
         var request = get("/api/labels/" + testLabel.getId()).with(token);
@@ -106,24 +95,28 @@ public class LabelControllerTest {
 
     @Test
     public void testCreate() throws Exception {
-        var data = modelGenerator.generateLabel();
+        var dto = new LabelCreateDTO();
+
+        dto.setName(testLabel.getName());
 
         var request = post("/api/labels")
                 .with(jwt())
                 .contentType(APPLICATION_JSON)
-                .content(om.writeValueAsString(data));
+                .content(om.writeValueAsString(dto));
         var result = mockMvc
                 .perform(request)
                 .andExpect(status().isCreated())
                 .andReturn();
         var body = result.getResponse().getContentAsString();
         assertThatJson(body).and(
-                v -> v.node("createdAt").isPresent());
+                v -> v.node("createdAt").isPresent(),
+                v -> v.node("name").isEqualTo(testLabel.getName()));
     }
 
     @Test
     public void testUpdate() throws Exception {
         repository.save(testLabel);
+
         var dto = new LabelUpdateDTO();
         dto.setName(JsonNullable.of("name"));
 
@@ -133,7 +126,7 @@ public class LabelControllerTest {
         mockMvc.perform(request).andExpect(status().isOk());
 
         var label = repository.findById(testLabel.getId()).orElseThrow();
-        assertThat(label.getName()).isEqualTo(dto.getName().get());
+        assertThat(label.getName()).isEqualTo("name");
     }
 
     @Test

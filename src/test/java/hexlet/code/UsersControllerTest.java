@@ -9,7 +9,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import hexlet.code.dto.user.UserCreateDTO;
 import hexlet.code.dto.user.UserDTO;
+import hexlet.code.mapper.UserMapper;
 import hexlet.code.util.ModelGenerator;
 import org.openapitools.jackson.nullable.JsonNullable;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -20,11 +22,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 
-@ContextConfiguration(classes = AppApplication.class)
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest
 @AutoConfigureMockMvc
 public class UsersControllerTest {
 
@@ -36,6 +36,9 @@ public class UsersControllerTest {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private UserMapper userMapper;
 
     private ModelGenerator modelGenerator = new ModelGenerator();
 
@@ -71,13 +74,43 @@ public class UsersControllerTest {
     }
 
     @Test
-    public void testIndex() throws Exception {
+    public void testCreateWithWrongName() throws Exception {
+        var data = testUser;
+        data.setFirstName("wrong");
+        var dto = userMapper.map(data);
+
+        var request = post("/api/users")
+                .with(jwt())
+                .contentType(APPLICATION_JSON)
+                .content(om.writeValueAsString(dto));
+
+        mockMvc.perform(request)
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void testUpdateWithWrongName() throws Exception {
+        var data = testUser;
+        data.setFirstName("wrong");
+
+        var dto = userMapper.map(data);
+
+        var request = put("/api/users/" + testUser.getId()).with(jwt())
+                .contentType(APPLICATION_JSON)
+                .content(om.writeValueAsString(dto));
+        mockMvc.perform(request)
+                .andExpect(status().isBadRequest());
+
+    }
+
+    @Test
+    public void testGetAll() throws Exception {
         mockMvc.perform(get("/api/users").with(jwt()))
                 .andExpect(status().isOk());
     }
 
     @Test
-    public void testShow() throws Exception {
+    public void testGetById() throws Exception {
         var request = get("/api/users/" + testUser.getId()).with(jwt());
         mockMvc.perform(request)
                 .andExpect(status().isOk());

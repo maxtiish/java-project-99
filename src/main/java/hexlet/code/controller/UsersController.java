@@ -32,14 +32,14 @@ public class UsersController {
 
     @GetMapping("/users")
     @ResponseStatus(HttpStatus.OK)
-    public List<UserDTO> index() {
+    public List<UserDTO> getAll() {
         return service.getAll();
     }
 
     @GetMapping("/users/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public UserDTO show(@PathVariable Long id) {
-        return service.show(id);
+    public UserDTO getById(@PathVariable Long id) {
+        return service.getById(id);
     }
 
     @PutMapping("/users/{id}")

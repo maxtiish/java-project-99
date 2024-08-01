@@ -18,20 +18,16 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-import java.nio.charset.StandardCharsets;
-
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
-import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -52,22 +48,13 @@ public class TaskStatusControllerTest {
     @Autowired
     private ObjectMapper om;
 
-    @Autowired
-    private ModelGenerator modelGenerator;
-
+    private ModelGenerator modelGenerator = new ModelGenerator();
     private static Faker faker = new Faker();
-
     private TaskStatus testTaskStatus;
-
     private SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor token;
 
     @BeforeEach
     public void setUp() {
-        mockMvc = MockMvcBuilders.webAppContextSetup(wac)
-                .defaultResponseCharacterEncoding(StandardCharsets.UTF_8)
-                .apply(springSecurity())
-                .build();
-
         token = jwt().jwt(builder -> builder.subject("hexlet@example.com"));
 
         testTaskStatus = modelGenerator.generateTaskStatus();
@@ -79,7 +66,7 @@ public class TaskStatusControllerTest {
     }
 
     @Test
-    public void testIndex() throws Exception {
+    public void testGetAll() throws Exception {
         repository.save(testTaskStatus);
         var result = mockMvc.perform(get("/api/task_statuses").with(jwt()))
                 .andExpect(status().isOk())
@@ -91,10 +78,9 @@ public class TaskStatusControllerTest {
 
     @Test
     public void testCreate() throws Exception {
-        var dto = new TaskStatusCreateDTO();
-
-        dto.setName(testTaskStatus.getName());
-        dto.setSlug(testTaskStatus.getSlug());
+        var dto = new TaskStatusCreateDTO()
+                .name("name")
+                .slug("slug");
 
         var request = post("/api/task_statuses")
                 .with(token)
@@ -105,9 +91,9 @@ public class TaskStatusControllerTest {
                 .andExpect(status().isCreated());
 
         var taskStatus = repository.findBySlug(testTaskStatus.getSlug()).orElseThrow();
-        assertNotNull(taskStatus);
-        assertThat(taskStatus.getName()).isEqualTo(dto.getName());
-
+        assertThat(taskStatus).isNotNull();
+        assertEquals("name", dto.name());
+        assertEquals("slug", dto.slug());
     }
 
     @Test
@@ -130,7 +116,7 @@ public class TaskStatusControllerTest {
     }
 
     @Test
-    public void testShow() throws Exception {
+    public void testGetById() throws Exception {
         repository.save(testTaskStatus);
 
         var request = get("/api/task_statuses/" + testTaskStatus.getId()).with(token);

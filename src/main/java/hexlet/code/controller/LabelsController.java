@@ -29,14 +29,14 @@ public class LabelsController {
 
     @GetMapping("/labels")
     @ResponseStatus(HttpStatus.OK)
-    public List<LabelDTO> index() {
+    public List<LabelDTO> getAll() {
         return service.getAll();
     }
 
     @GetMapping("/labels/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public LabelDTO show(@PathVariable Long id) {
-        return service.show(id);
+    public LabelDTO getById(@PathVariable Long id) {
+        return service.getById(id);
     }
 
     @PutMapping("/labels/{id}")

@@ -29,7 +29,7 @@ public class TaskController {
 
     @GetMapping("/tasks")
     @ResponseStatus(HttpStatus.OK)
-    ResponseEntity<List<TaskDTO>> index(TaskParamsDTO params) {
+    ResponseEntity<List<TaskDTO>> getAll(TaskParamsDTO params) {
         var tasks = service.getAll(params);
         return ResponseEntity.ok()
                 .header("X-Total-Count", String.valueOf(tasks.size()))
@@ -38,8 +38,8 @@ public class TaskController {
 
     @GetMapping("/tasks/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public TaskDTO show(@PathVariable Long id) {
-        return service.show(id);
+    public TaskDTO getById(@PathVariable Long id) {
+        return service.getById(id);
     }
 
     @PutMapping("/tasks/{id}")

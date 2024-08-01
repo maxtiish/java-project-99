@@ -6,12 +6,8 @@ import hexlet.code.model.TaskStatus;
 import hexlet.code.model.User;
 import net.datafaker.Faker;
 import org.instancio.Instancio;
-import lombok.Getter;
 import org.instancio.Select;
-import org.springframework.stereotype.Component;
 
-@Getter
-@Component
 public class ModelGenerator {
     private static Faker faker = new Faker();
 

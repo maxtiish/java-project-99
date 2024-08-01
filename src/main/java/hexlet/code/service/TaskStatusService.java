@@ -3,7 +3,6 @@ package hexlet.code.service;
 import hexlet.code.dto.status.TaskStatusCreateDTO;
 import hexlet.code.dto.status.TaskStatusDTO;
 import hexlet.code.dto.status.TaskStatusUpdateDTO;
-import hexlet.code.exception.ResourceNotFoundException;
 import hexlet.code.mapper.TaskStatusMapper;
 import hexlet.code.repository.TaskStatusRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,9 +25,9 @@ public class TaskStatusService {
                 .toList();
     }
 
-    public TaskStatusDTO show(Long id) {
+    public TaskStatusDTO getById(Long id) {
         var taskStatus = repository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Task Status with id " + id + " not found"));
+                .orElseThrow();
         return mapper.map(taskStatus);
     }
 

@@ -57,9 +57,7 @@ public class TaskControllerTest {
     @Autowired
     private TaskStatusRepository taskStatusRepository;
 
-    @Autowired
-    private ModelGenerator modelGenerator;
-
+    private ModelGenerator modelGenerator = new ModelGenerator();
     private static Faker faker = new Faker();
 
     private Task testTask;
@@ -90,7 +88,7 @@ public class TaskControllerTest {
     }
 
     @Test
-    public void testIndex() throws Exception {
+    public void testGetAll() throws Exception {
         taskRepository.save(testTask);
         var result = mockMvc.perform(get("/api/tasks").with(jwt()))
                 .andExpect(status().isOk())
@@ -100,7 +98,7 @@ public class TaskControllerTest {
     }
 
     @Test
-    public void testShow() throws Exception {
+    public void testGetById() throws Exception {
         taskRepository.save(testTask);
 
         var request = get("/api/tasks/" + testTask.getId()).with(token);
@@ -111,7 +109,10 @@ public class TaskControllerTest {
 
         var body = result.getResponse().getContentAsString();
         assertThatJson(body).and(
-                v -> v.node("name").isEqualTo(testTask.getName())
+                v -> v.node("name").isEqualTo(testTask.getName()),
+                v -> v.node("createdAt").isPresent(),
+                v -> v.node("description").isEqualTo(testTask.getDescription()),
+                v -> v.node("index").isEqualTo(testTask.getIndex())
         );
     }
 
@@ -158,7 +159,7 @@ public class TaskControllerTest {
 
     @Test
     public void testParams() throws Exception {
-        var request = get("/api/tasks?titleCont=create&assigneeId=1&status=to_be_fixed&labelId=1").with(token);
+        var request = get("/api/tasks?titleCont=create&assigneeId=1&taskStatus=to_be_fixed&labelId=1").with(token);
         var result = mockMvc.perform(request)
                 .andExpect(status().isOk())
                 .andReturn();
@@ -169,7 +170,7 @@ public class TaskControllerTest {
                         .and(v -> v.node("name").asString().containsIgnoringCase("create"))
                         .and(v -> v.node("assigneeId").isEqualTo(1))
                         .and(v -> v.node("labelId").isEqualTo(1))
-                        .and(v -> v.node("status").isEqualTo("to_be_fixed"))
+                        .and(v -> v.node("taskStatus").asString().isEqualTo("to_be_fixed"))
         );
     }
 }

@@ -16,7 +16,6 @@ public class TaskCreateDTO {
 
     private Integer index;
 
-    @NotNull
     private String status;
 
     @Size(min = 1)

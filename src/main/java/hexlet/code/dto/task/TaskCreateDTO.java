@@ -11,7 +11,6 @@ import java.util.Set;
 @Getter
 @Setter
 public class TaskCreateDTO {
-    @NotNull
     private Long assigneeId;
 
     private Integer index;
@@ -20,7 +19,6 @@ public class TaskCreateDTO {
     private String status;
 
     @Size(min = 1)
-    @NotNull
     private String name;
 
     private String description;

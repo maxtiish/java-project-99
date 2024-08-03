@@ -79,8 +79,8 @@ public class TaskStatusControllerTest {
     @Test
     public void testCreate() throws Exception {
         var dto = new TaskStatusCreateDTO()
-                .name("name")
-                .slug("slug");
+                .setName("name")
+                .setSlug("slug");
 
         var request = post("/api/task_statuses")
                 .with(token)
@@ -90,10 +90,10 @@ public class TaskStatusControllerTest {
         mockMvc.perform(request)
                 .andExpect(status().isCreated());
 
-        var taskStatus = repository.findBySlug(testTaskStatus.getSlug()).orElseThrow();
+        var taskStatus = repository.findBySlug(testTaskStatus.getSlug());
         assertThat(taskStatus).isNotNull();
-        assertEquals("name", dto.name());
-        assertEquals("slug", dto.slug());
+        assertEquals("name", dto.getName());
+        assertEquals("slug", dto.getSlug());
     }
 
     @Test

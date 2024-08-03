@@ -11,7 +11,7 @@ import java.time.LocalDate;
 
 @Getter
 @Setter
-@Accessors(fluent = true, chain = true)
+@Accessors(chain = true)
 public class TaskStatusCreateDTO {
     @NotBlank
     @Size(min = 1)

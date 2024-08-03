@@ -9,7 +9,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import hexlet.code.dto.user.UserCreateDTO;
 import hexlet.code.dto.user.UserDTO;
 import hexlet.code.mapper.UserMapper;
 import hexlet.code.util.ModelGenerator;
@@ -89,18 +88,18 @@ public class UsersControllerTest {
     }
 
     @Test
-    public void testUpdateWithWrongName() throws Exception {
+    public void testUpdateWithWrongUser() throws Exception {
         var data = testUser;
-        data.setFirstName("wrong");
+
+        var wrongUser = modelGenerator.generateUser();
 
         var dto = userMapper.map(data);
 
-        var request = put("/api/users/" + testUser.getId()).with(jwt())
+        var request = put("/api/users/" + wrongUser.getId()).with(jwt())
                 .contentType(APPLICATION_JSON)
                 .content(om.writeValueAsString(dto));
         mockMvc.perform(request)
                 .andExpect(status().isBadRequest());
-
     }
 
     @Test

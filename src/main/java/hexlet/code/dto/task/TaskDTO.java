@@ -1,6 +1,5 @@
 package hexlet.code.dto.task;
 
-import hexlet.code.model.TaskStatus;
 import lombok.Getter;
 import lombok.Setter;
 

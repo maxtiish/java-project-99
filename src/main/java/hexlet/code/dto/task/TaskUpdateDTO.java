@@ -10,8 +10,6 @@ import java.util.Set;
 @Getter
 @Setter
 public class TaskUpdateDTO {
-
-    @NotBlank
     private JsonNullable<String> name;
 
     private JsonNullable<String> description;

@@ -18,7 +18,6 @@ public class TaskCreateDTO {
     private String status;
 
     @Size(min = 1)
-    @NotBlank
     private String name;
 
     private String description;

@@ -44,7 +44,6 @@ public class Task implements BaseEntity {
     @ManyToOne(fetch = FetchType.EAGER)
     private User assignee;
 
-    @NotBlank
     @ToString.Include
     @Size(min = 1)
     private String name;

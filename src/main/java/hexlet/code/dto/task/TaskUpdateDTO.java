@@ -1,5 +1,6 @@
 package hexlet.code.dto.task;
 
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
@@ -10,19 +11,16 @@ import java.util.Set;
 @Getter
 @Setter
 public class TaskUpdateDTO {
-    @NotNull
+    @NotBlank
     private JsonNullable<String> title; //name
 
-    @NotNull
     private JsonNullable<String> content; //description
 
-    @NotNull
     private JsonNullable<Long> assigneeId;
 
     @NotNull
     private JsonNullable<String> status;
 
-    @NotNull
     private JsonNullable<Set<Long>> taskLabelIds;
 
 }

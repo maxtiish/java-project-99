@@ -130,6 +130,7 @@ public class TaskControllerTest {
         assertNotNull(task);
         assertThat(task.getName()).isEqualTo(dto.getName());
         assertThat(task.getDescription()).isEqualTo(dto.getDescription());
+        assertThat(task.getCreatedAt()).isNotNull();
     }
 
     @Test

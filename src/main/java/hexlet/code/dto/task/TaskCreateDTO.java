@@ -1,29 +1,31 @@
 package hexlet.code.dto.task;
 
-import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalDate;
 import java.util.Set;
 
 @Getter
 @Setter
 public class TaskCreateDTO {
+    @NotNull
     private Long assigneeId;
 
+    @NotNull
     private Integer index;
 
+    @NotNull
     private String status;
 
     @Size(min = 1)
-    @NotBlank
+    @NotNull
     private String name;
 
+    @NotNull
     private String description;
 
-    private LocalDate createdAt;
-
+    @NotNull
     private Set<Long> taskLabelIds;
 }

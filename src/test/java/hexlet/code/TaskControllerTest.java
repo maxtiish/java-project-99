@@ -109,9 +109,9 @@ public class TaskControllerTest {
 
         var body = result.getResponse().getContentAsString();
         assertThatJson(body).and(
-                v -> v.node("name").isEqualTo(testTask.getName()),
+                v -> v.node("title").isEqualTo(testTask.getName()),
                 v -> v.node("createdAt").isPresent(),
-                v -> v.node("description").isEqualTo(testTask.getDescription()),
+                v -> v.node("content").isEqualTo(testTask.getDescription()),
                 v -> v.node("index").isEqualTo(testTask.getIndex())
         );
     }
@@ -128,8 +128,8 @@ public class TaskControllerTest {
 
         var task = taskRepository.findByName(testTask.getName()).orElseThrow();
         assertNotNull(task);
-        assertThat(task.getName()).isEqualTo(dto.getName());
-        assertThat(task.getDescription()).isEqualTo(dto.getDescription());
+        assertThat(task.getName()).isEqualTo(dto.getTitle());
+        assertThat(task.getDescription()).isEqualTo(dto.getContent());
         assertThat(task.getCreatedAt()).isNotNull();
     }
 
@@ -137,8 +137,8 @@ public class TaskControllerTest {
     public void testUpdate() throws Exception {
         taskRepository.save(testTask);
         var dto = new TaskUpdateDTO();
-        dto.setName(JsonNullable.of("name"));
-        dto.setDescription(JsonNullable.of("description"));
+        dto.setTitle(JsonNullable.of("name"));
+        dto.setContent(JsonNullable.of("description"));
 
         var request = put("/api/tasks/" + testTask.getId()).with(token)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -146,8 +146,8 @@ public class TaskControllerTest {
         mockMvc.perform(request).andExpect(status().isOk());
 
         var task = taskRepository.findById(testTask.getId()).orElseThrow();
-        assertThat(task.getName()).isEqualTo(dto.getName().get());
-        assertThat(task.getDescription()).isEqualTo(dto.getDescription().get());
+        assertThat(task.getName()).isEqualTo(dto.getTitle().get());
+        assertThat(task.getDescription()).isEqualTo(dto.getContent().get());
     }
 
     @Test

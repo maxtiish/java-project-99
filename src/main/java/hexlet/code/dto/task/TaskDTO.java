@@ -17,9 +17,9 @@ public class TaskDTO {
 
     private Long assigneeId;
 
-    private String name;
+    private String title; //name
 
-    private String description;
+    private String content; //description
 
     private String status;
 

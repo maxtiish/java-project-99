@@ -11,10 +11,10 @@ import java.util.Set;
 @Setter
 public class TaskUpdateDTO {
     @NotNull
-    private JsonNullable<String> name;
+    private JsonNullable<String> title; //name
 
     @NotNull
-    private JsonNullable<String> description;
+    private JsonNullable<String> content; //description
 
     @NotNull
     private JsonNullable<Long> assigneeId;

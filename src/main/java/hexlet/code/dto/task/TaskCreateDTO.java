@@ -22,7 +22,6 @@ public class TaskCreateDTO {
     private String status;
 
     @NotBlank
-    @Size(min = 1)
     private String title; //name
 
     private String content; //description

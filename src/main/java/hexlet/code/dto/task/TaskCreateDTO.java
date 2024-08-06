@@ -1,6 +1,6 @@
 package hexlet.code.dto.task;
 
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -11,16 +11,14 @@ import java.util.Set;
 public class TaskCreateDTO {
     private Long assigneeId;
 
-    @NotNull
     private Integer index;
 
-    @NotNull
     private String status;
 
+    @NotBlank
     private String name;
 
     private String description;
 
-    @NotNull
     private Set<Long> taskLabelIds;
 }

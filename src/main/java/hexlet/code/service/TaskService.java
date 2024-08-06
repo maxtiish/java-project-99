@@ -22,9 +22,6 @@ public class TaskService {
     private TaskSpecification builder;
 
     @Autowired
-    private UserUtils userUtils;
-
-    @Autowired
     private TaskMapper mapper;
 
     public List<TaskDTO> getAll(TaskParamsDTO params) {
@@ -42,7 +39,6 @@ public class TaskService {
 
     public TaskDTO create(TaskCreateDTO dto) {
         var task = mapper.map(dto);
-        task.setAssignee(userUtils.getCurrentUser());
         repository.save(task);
         return mapper.map(task);
     }

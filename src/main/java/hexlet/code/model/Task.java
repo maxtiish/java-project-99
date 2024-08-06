@@ -10,6 +10,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToMany;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Setter;
 import lombok.Getter;
@@ -52,6 +53,7 @@ public class Task implements BaseEntity {
     @ToString.Include
     private String description;
 
+    @NotNull
     @JoinColumn(nullable = false)
     @ManyToOne(fetch = FetchType.EAGER)
     private TaskStatus taskStatus;

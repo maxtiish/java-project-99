@@ -7,7 +7,6 @@ import hexlet.code.mapper.LabelMapper;
 import hexlet.code.model.Label;
 import hexlet.code.repository.LabelRepository;
 import hexlet.code.util.ModelGenerator;
-import net.datafaker.Faker;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,7 +17,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.web.context.WebApplicationContext;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
@@ -35,9 +33,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 public class LabelControllerTest {
     @Autowired
-    private WebApplicationContext wac;
-
-    @Autowired
     private MockMvc mockMvc;
 
     @Autowired
@@ -52,12 +47,10 @@ public class LabelControllerTest {
     private Label testLabel;
 
     private SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor token;
-    private ModelGenerator modelGenerator = new ModelGenerator();
-    private static Faker faker = new Faker();
 
     @BeforeEach
     public void setUp() {
-        testLabel = modelGenerator.generateLabel();
+        testLabel = ModelGenerator.generateLabel();
 
         token = jwt().jwt(builder -> builder.subject("hexlet@example.com"));
     }
@@ -97,20 +90,21 @@ public class LabelControllerTest {
     public void testCreate() throws Exception {
         var dto = new LabelCreateDTO();
 
-        dto.setName(testLabel.getName());
+        var name = testLabel.getName();
+        dto.setName(name);
 
         var request = post("/api/labels")
                 .with(jwt())
                 .contentType(APPLICATION_JSON)
                 .content(om.writeValueAsString(dto));
-        var result = mockMvc
-                .perform(request)
+        mockMvc.perform(request)
                 .andExpect(status().isCreated())
                 .andReturn();
-        var body = result.getResponse().getContentAsString();
-        assertThatJson(body).and(
-                v -> v.node("createdAt").isPresent(),
-                v -> v.node("name").isEqualTo(testLabel.getName()));
+
+        var result = repository.findByName(name).orElseThrow();
+        assertThat(testLabel.getName()).isEqualTo(result.getName());
+        assertThat(testLabel.getCreatedAt()).isNotNull();
+
     }
 
     @Test

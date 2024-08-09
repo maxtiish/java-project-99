@@ -29,8 +29,6 @@ import static jakarta.persistence.GenerationType.IDENTITY;
 @Getter
 @Table(name = "tasks")
 @EntityListeners(AuditingEntityListener.class)
-@ToString(includeFieldNames = true, onlyExplicitlyIncluded = true)
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Task implements BaseEntity {
     @Id
     @GeneratedValue(strategy = IDENTITY)

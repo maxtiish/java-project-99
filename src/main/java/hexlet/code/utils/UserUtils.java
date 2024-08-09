@@ -21,9 +21,4 @@ public class UserUtils {
         var email = authentication.getName();
         return repository.findByEmail(email).orElseThrow();
     }
-
-    public boolean isSameUser(Long id) {
-        var currentUser = getCurrentUser();
-        return currentUser.getId() == id;
-    }
 }

@@ -24,8 +24,6 @@ import static jakarta.persistence.GenerationType.IDENTITY;
 @Setter
 @Table(name = "labels")
 @EntityListeners(AuditingEntityListener.class)
-@ToString(includeFieldNames = true, onlyExplicitlyIncluded = true)
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Label {
     @Id
     @GeneratedValue(strategy = IDENTITY)

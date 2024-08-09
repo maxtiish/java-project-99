@@ -10,7 +10,6 @@ import hexlet.code.repository.TaskRepository;
 import hexlet.code.repository.TaskStatusRepository;
 import hexlet.code.repository.UserRepository;
 import hexlet.code.util.ModelGenerator;
-import net.datafaker.Faker;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -21,7 +20,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.web.context.WebApplicationContext;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -36,9 +34,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 public class TaskControllerTest {
-    @Autowired
-    private WebApplicationContext wac;
-
     @Autowired
     private MockMvc mockMvc;
 
@@ -57,25 +52,21 @@ public class TaskControllerTest {
     @Autowired
     private TaskStatusRepository taskStatusRepository;
 
-    private ModelGenerator modelGenerator = new ModelGenerator();
-    private static Faker faker = new Faker();
-
     private Task testTask;
     private User user;
     private TaskStatus status;
-
     private SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor token;
 
     @BeforeEach
     public void setUp() {
-        user = modelGenerator.generateUser();
+        user = ModelGenerator.generateUser();
         userRepository.save(user);
         token = jwt().jwt(builder -> builder.subject(user.getEmail()));
 
-        status = modelGenerator.generateTaskStatus();
+        status = ModelGenerator.generateTaskStatus();
         taskStatusRepository.save(status);
-        testTask = modelGenerator.generateTask();
 
+        testTask = ModelGenerator.generateTask();
         testTask.setAssignee(user);
         testTask.setTaskStatus(status);
     }

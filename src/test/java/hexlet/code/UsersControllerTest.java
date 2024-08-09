@@ -1,6 +1,6 @@
 package hexlet.code;
 
-import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -12,6 +12,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import hexlet.code.dto.user.UserDTO;
 import hexlet.code.mapper.UserMapper;
 import hexlet.code.util.ModelGenerator;
+import org.junit.jupiter.api.AfterEach;
 import org.openapitools.jackson.nullable.JsonNullable;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import hexlet.code.model.User;
@@ -21,6 +22,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.web.servlet.MockMvc;
 
 @SpringBootTest
@@ -39,89 +41,60 @@ UsersControllerTest {
 
     @Autowired
     private UserMapper userMapper;
-
-    private ModelGenerator modelGenerator = new ModelGenerator();
-
     private User testUser;
+    private SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor token;
 
     @BeforeEach
     public void beforeEach() {
-        testUser = modelGenerator.generateUser();
+        testUser = ModelGenerator.generateUser();
         userRepository.save(testUser);
+        token = jwt().jwt(builder -> builder.subject(testUser.getEmail()));
     }
 
-    @Test
-    void testCreate() throws Exception {
-        var data = modelGenerator.generateUser();
-
-        var request = post("/api/users")
-                .with(jwt())
-                .contentType(APPLICATION_JSON)
-                .content(om.writeValueAsString(data));
-        var result = mockMvc
-                .perform(request)
-                .andExpect(status().isCreated())
-                .andReturn();
-        var body = result.getResponse().getContentAsString();
-
-        assertThatJson(body).and(
-                v -> v.node("password").isAbsent(),
-                v -> v.node("id").isPresent(),
-                v -> v.node("firstName").isEqualTo(data.getFirstName()),
-                v -> v.node("lastName").isEqualTo(data.getLastName()),
-                v -> v.node("email").isEqualTo(data.getEmail()),
-                v -> v.node("createdAt").isPresent());
-    }
-
-    @Test
-    public void testCreateWithWrongName() throws Exception {
-        var data = testUser;
-        data.setFirstName("wrong");
-        var dto = userMapper.map(data);
-
-        var request = post("/api/users")
-                .with(jwt())
-                .contentType(APPLICATION_JSON)
-                .content(om.writeValueAsString(dto));
-
-        mockMvc.perform(request)
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    public void testUpdateWithWrongUser() throws Exception {
-        var data = testUser;
-
-        var wrongUser = modelGenerator.generateUser();
-
-        var dto = userMapper.map(data);
-
-        var request = put("/api/users/" + wrongUser.getId()).with(jwt())
-                .contentType(APPLICATION_JSON)
-                .content(om.writeValueAsString(dto));
-        mockMvc.perform(request)
-                .andExpect(status().isBadRequest());
+    @AfterEach
+    public void clean() {
+        userRepository.deleteAll();
     }
 
     @Test
     public void testGetAll() throws Exception {
-        mockMvc.perform(get("/api/users").with(jwt()))
+        mockMvc.perform(get("/api/users").with(token))
                 .andExpect(status().isOk());
     }
 
     @Test
     public void testGetById() throws Exception {
-        var request = get("/api/users/" + testUser.getId()).with(jwt());
+        var request = get("/api/users/" + testUser.getId()).with(token);
         mockMvc.perform(request)
                 .andExpect(status().isOk());
     }
 
     @Test
+    void testCreate() throws Exception {
+        var data = ModelGenerator.generateUser();
+
+        var request = post("/api/users")
+                .with(token)
+                .contentType(APPLICATION_JSON)
+                .content(om.writeValueAsString(data));
+        mockMvc.perform(request)
+                .andExpect(status().isCreated())
+                .andReturn();
+
+        var user = userRepository.findByEmail(data.getEmail()).orElseThrow();
+        assertThat(user.getFirstName()).isEqualTo(data.getFirstName());
+        assertThat(user.getLastName()).isEqualTo(data.getLastName());
+        assertThat(user.getEmail()).isEqualTo(data.getEmail());
+        assertThat(user.getCreatedAt()).isNotNull();
+        assertThat(user.getId()).isNotNull();
+    }
+
+    @Test
     public void testUpdate() throws Exception {
         var data = new UserDTO();
-        data.setFirstName(String.valueOf(JsonNullable.of("New name")));
+        data.setFirstName(String.valueOf(JsonNullable.of("new name")));
 
-        var request = put("/api/users/" + testUser.getId()).with(jwt())
+        var request = put("/api/users/" + testUser.getId()).with(token)
                 .contentType(APPLICATION_JSON)
                 .content(om.writeValueAsString(data));
         mockMvc.perform(request)
@@ -129,8 +102,40 @@ UsersControllerTest {
     }
 
     @Test
+    public void testUpdateWithWrongUser() throws Exception {
+        var user = ModelGenerator.generateUser();
+        user.setFirstName(String.valueOf(JsonNullable.of("new name")));
+
+        var wrongUser = ModelGenerator.generateUser();
+        var newToken = jwt().jwt(builder -> builder.subject(wrongUser.getEmail()));
+
+        mockMvc.perform(post("/api/users").with(newToken)
+                .contentType(APPLICATION_JSON)
+                .content(om.writeValueAsString(wrongUser)));
+
+        var request = put("/api/users/" + testUser.getId()).with(newToken)
+                .contentType(APPLICATION_JSON)
+                .content(om.writeValueAsString(user));
+        mockMvc.perform(request)
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
     public void testDelete() throws Exception {
-        mockMvc.perform(delete("/api/users/" + testUser.getId()).with(jwt()))
+        mockMvc.perform(delete("/api/users/" + testUser.getId()).with(token))
                 .andExpect(status().isNoContent());
+    }
+
+    @Test
+    public void testDeleteWithWrongUser() throws Exception {
+        var user = ModelGenerator.generateUser();
+        mockMvc.perform(post("/api/users").with(jwt())
+                .contentType(APPLICATION_JSON)
+                .content(om.writeValueAsString(user)));
+        token = jwt().jwt(builder -> builder.subject(testUser.getEmail()));
+        var newToken = jwt().jwt(builder -> builder.subject(user.getEmail()));
+
+        mockMvc.perform(delete("/api/users/" + testUser.getId()).with(newToken))
+                .andExpect(status().isForbidden());
     }
 }

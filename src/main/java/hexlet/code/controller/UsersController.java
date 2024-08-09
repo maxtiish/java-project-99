@@ -8,7 +8,6 @@ import hexlet.code.utils.UserUtils;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,6 +17,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -42,9 +42,12 @@ public class UsersController {
 
     @PutMapping("/users/{id}")
     @ResponseStatus(HttpStatus.OK)
-    @PreAuthorize("@userUtils.isSameUser(#id)")
     public UserDTO update(@RequestBody @Valid UserUpdateDTO dto, @PathVariable Long id) {
-        return service.update(dto, id);
+        if (userUtils.getCurrentUser().getId() != id) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access Denied");
+        } else {
+            return service.update(dto, id);
+        }
     }
 
     @PostMapping("/users")
@@ -55,8 +58,11 @@ public class UsersController {
 
     @DeleteMapping("/users/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @PreAuthorize("@userUtils.isSameUser(#id)")
     public void delete(@PathVariable Long id) {
-        service.delete(id);
+        if (userUtils.getCurrentUser().getId() != id) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access Denied");
+        } else {
+            service.delete(id);
+        }
     }
 }

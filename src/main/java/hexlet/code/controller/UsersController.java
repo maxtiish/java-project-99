@@ -8,6 +8,7 @@ import hexlet.code.utils.UserUtils;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -30,8 +31,11 @@ public class UsersController {
 
     @GetMapping("/users")
     @ResponseStatus(HttpStatus.OK)
-    public List<UserDTO> getAll() {
-        return service.getAll();
+    public ResponseEntity<List<UserDTO>> getAll() {
+        var users = service.getAll();
+        return ResponseEntity.ok()
+                .header("X-Total-Count", String.valueOf(users.size()))
+                .body(users);
     }
 
     @GetMapping("/users/{id}")
@@ -61,8 +65,7 @@ public class UsersController {
     public void delete(@PathVariable Long id) {
         if (userUtils.getCurrentUser().getId() != id) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access Denied");
-        } else {
-            service.delete(id);
         }
+        service.delete(id);
     }
 }

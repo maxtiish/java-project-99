@@ -8,6 +8,8 @@ import net.datafaker.Faker;
 import org.instancio.Instancio;
 import org.instancio.Select;
 
+import java.util.HashSet;
+
 public class ModelGenerator {
     private static Faker faker = new Faker();
 
@@ -35,10 +37,10 @@ public class ModelGenerator {
                 .ignore(Select.field(Task::getId))
                 .ignore(Select.field(Task::getTaskStatus))
                 .ignore(Select.field(Task::getAssignee))
-                .ignore(Select.field(Task::getLabels))
                 .supply(Select.field(Task::getName), () -> faker.lorem().word())
                 .supply(Select.field(Task::getDescription), () -> faker.lorem().sentence())
                 .supply(Select.field(Task::getIndex), () -> faker.number().positive())
+                .supply(Select.field(Task::getLabels), () -> new HashSet<Label>())
                 .create();
     }
 

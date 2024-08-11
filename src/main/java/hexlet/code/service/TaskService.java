@@ -7,20 +7,16 @@ import hexlet.code.dto.task.TaskParamsDTO;
 import hexlet.code.mapper.TaskMapper;
 import hexlet.code.repository.TaskRepository;
 import hexlet.code.specification.TaskSpecification;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
+@AllArgsConstructor
 public class TaskService {
-    @Autowired
     private TaskRepository repository;
-
-    @Autowired
     private TaskSpecification builder;
-
-    @Autowired
     private TaskMapper mapper;
 
     public List<TaskDTO> getAll(TaskParamsDTO params) {

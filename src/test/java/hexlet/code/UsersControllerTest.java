@@ -11,6 +11,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import hexlet.code.dto.user.UserDTO;
 import hexlet.code.mapper.UserMapper;
+import hexlet.code.repository.TaskRepository;
 import hexlet.code.util.ModelGenerator;
 import org.junit.jupiter.api.AfterEach;
 import org.openapitools.jackson.nullable.JsonNullable;
@@ -40,6 +41,9 @@ UsersControllerTest {
     private UserRepository userRepository;
 
     @Autowired
+    private TaskRepository taskRepository;
+
+    @Autowired
     private UserMapper userMapper;
     private User testUser;
     private SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor token;
@@ -53,7 +57,10 @@ UsersControllerTest {
 
     @AfterEach
     public void clean() {
-        userRepository.deleteAll();
+        taskRepository.deleteAll();
+        if (testUser != null) {
+            userRepository.deleteById(testUser.getId());
+        }
     }
 
     @Test
@@ -103,8 +110,7 @@ UsersControllerTest {
 
     @Test
     public void testUpdateWithWrongUser() throws Exception {
-        var user = ModelGenerator.generateUser();
-        user.setFirstName(String.valueOf(JsonNullable.of("new name")));
+        testUser.setFirstName(String.valueOf(JsonNullable.of("new name")));
 
         var wrongUser = ModelGenerator.generateUser();
         var newToken = jwt().jwt(builder -> builder.subject(wrongUser.getEmail()));
@@ -115,7 +121,7 @@ UsersControllerTest {
 
         var request = put("/api/users/" + testUser.getId()).with(newToken)
                 .contentType(APPLICATION_JSON)
-                .content(om.writeValueAsString(user));
+                .content(om.writeValueAsString(testUser));
         mockMvc.perform(request)
                 .andExpect(status().isForbidden());
     }
@@ -132,10 +138,19 @@ UsersControllerTest {
         mockMvc.perform(post("/api/users").with(jwt())
                 .contentType(APPLICATION_JSON)
                 .content(om.writeValueAsString(user)));
-        token = jwt().jwt(builder -> builder.subject(testUser.getEmail()));
         var newToken = jwt().jwt(builder -> builder.subject(user.getEmail()));
 
         mockMvc.perform(delete("/api/users/" + testUser.getId()).with(newToken))
                 .andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void testDeleteWhileHasTask() throws Exception {
+        var task = ModelGenerator.generateTask();
+        task.setAssignee(testUser);
+        taskRepository.save(task);
+
+        mockMvc.perform(delete("/api/users/" + testUser.getId()).with(token))
+                .andExpect(status().isBadRequest());
     }
 }

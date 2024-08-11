@@ -5,6 +5,7 @@ import hexlet.code.dto.status.TaskStatusCreateDTO;
 import hexlet.code.dto.status.TaskStatusUpdateDTO;
 import hexlet.code.mapper.TaskStatusMapper;
 import hexlet.code.model.TaskStatus;
+import hexlet.code.repository.TaskRepository;
 import hexlet.code.repository.TaskStatusRepository;
 import hexlet.code.util.ModelGenerator;
 import org.junit.jupiter.api.AfterEach;
@@ -38,28 +39,34 @@ public class TaskStatusControllerTest {
     private TaskStatusMapper mapper;
 
     @Autowired
-    private TaskStatusRepository repository;
+    private TaskStatusRepository statusRepository;
+
+    @Autowired
+    private TaskRepository taskRepository;
 
     @Autowired
     private ObjectMapper om;
     private TaskStatus testTaskStatus;
-    private final String testSlug = "slug";
+    private final String testSlug = "word";
     private SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor token;
 
     @BeforeEach
     public void setUp() {
         testTaskStatus = ModelGenerator.generateTaskStatus();
         token = jwt().jwt(builder -> builder.subject("hexlet@example.com"));
+        statusRepository.save(testTaskStatus);
     }
 
     @AfterEach
     public void clean() {
-        repository.deleteAll();
+        taskRepository.deleteAll();
+        if (testTaskStatus != null) {
+            statusRepository.deleteById(testTaskStatus.getId());
+        }
     }
 
     @Test
     public void testGetAll() throws Exception {
-        repository.save(testTaskStatus);
         var result = mockMvc.perform(get("/api/task_statuses").with(jwt()))
                 .andExpect(status().isOk())
                 .andReturn();
@@ -70,8 +77,6 @@ public class TaskStatusControllerTest {
 
     @Test
     public void testGetById() throws Exception {
-        repository.save(testTaskStatus);
-
         var request = get("/api/task_statuses/" + testTaskStatus.getId()).with(token);
 
         var result = mockMvc.perform(request)
@@ -99,7 +104,7 @@ public class TaskStatusControllerTest {
         mockMvc.perform(request)
                 .andExpect(status().isCreated());
 
-        var taskStatus = repository.findBySlug(testTaskStatus.getSlug());
+        var taskStatus = statusRepository.findBySlug(testTaskStatus.getSlug());
         assertThat(taskStatus).isNotNull();
         assertEquals("name", dto.getName());
         assertEquals("slug", dto.getSlug());
@@ -107,27 +112,33 @@ public class TaskStatusControllerTest {
 
     @Test
     public void testUpdate() throws Exception {
-        repository.save(testTaskStatus);
-
         var dto = new TaskStatusUpdateDTO();
         dto.setSlug(JsonNullable.of(testSlug));
 
-        var request = put("/api/task_statuses/" + testTaskStatus.getId())
-                .with(token)
+        var request = put("/api/task_statuses/" + testTaskStatus.getId()).with(token)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(om.writeValueAsString(dto));
         mockMvc.perform(request).andExpect(status().isOk());
 
-        var taskStatus = repository.findById(testTaskStatus.getId()).orElseThrow();
+        var taskStatus = statusRepository.findById(testTaskStatus.getId()).orElseThrow();
 
         assertThat(taskStatus.getSlug()).isEqualTo(testSlug);
     }
 
     @Test
     public void testDelete() throws Exception {
-        repository.save(testTaskStatus);
         var request = delete("/api/task_statuses/" + testTaskStatus.getId()).with(token);
         mockMvc.perform(request).andExpect(status().isNoContent());
-        assertThat(repository.existsById(testTaskStatus.getId())).isEqualTo(false);
+        assertThat(statusRepository.existsById(testTaskStatus.getId())).isEqualTo(false);
+    }
+
+    @Test
+    public void testDeleteWhileHasTask() throws Exception {
+        var task = ModelGenerator.generateTask();
+        task.setTaskStatus(testTaskStatus);
+        taskRepository.save(task);
+
+        mockMvc.perform(delete("/api/task_statuses/" + testTaskStatus.getId()).with(token))
+                .andExpect(status().isBadRequest());
     }
 }

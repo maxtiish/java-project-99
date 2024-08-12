@@ -6,7 +6,6 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalDate;
 import java.util.Set;
 
 @Getter
@@ -26,6 +25,4 @@ public class TaskCreateDTO {
     private String content; //description
 
     private Set<Long> taskLabelIds;
-
-    private LocalDate createdAt;
 }

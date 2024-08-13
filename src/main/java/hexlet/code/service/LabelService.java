@@ -8,9 +8,7 @@ import hexlet.code.repository.LabelRepository;
 import hexlet.code.repository.TaskRepository;
 import lombok.AllArgsConstructor;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -48,10 +46,6 @@ public class LabelService {
     }
 
     public void delete(Long id) {
-        var label = labelRepository.findById(id);
-        if (label.isPresent() && taskRepository.findByLabelsName(label.get().getName()).isPresent()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Can Not Delete While Label Has Task");
-        }
         labelRepository.deleteById(id);
     }
 }

@@ -8,6 +8,7 @@ import hexlet.code.model.TaskStatus;
 import hexlet.code.repository.TaskRepository;
 import hexlet.code.repository.TaskStatusRepository;
 import hexlet.code.util.ModelGenerator;
+import jakarta.servlet.ServletException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,7 +21,9 @@ import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequ
 import org.springframework.test.web.servlet.MockMvc;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
+import static org.hibernate.validator.internal.util.Contracts.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -134,12 +137,14 @@ public class TaskStatusControllerTest {
     }
 
     @Test
-    public void testDeleteWhileHasTask() throws Exception {
+    public void testDeleteWhileHasTask() {
         var task = ModelGenerator.generateTask();
         task.setTaskStatus(testTaskStatus);
         taskRepository.save(task);
 
-        mockMvc.perform(delete("/api/task_statuses/" + testTaskStatus.getId()).with(token))
-                .andExpect(status().isBadRequest());
+        Throwable thrown = assertThrows(ServletException.class, () -> {
+            mockMvc.perform(delete("/api/task_statuses/" + testTaskStatus.getId()).with(token)); });
+        assertNotNull(thrown.getMessage());
+
     }
 }

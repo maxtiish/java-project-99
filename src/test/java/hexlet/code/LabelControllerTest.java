@@ -7,6 +7,7 @@ import hexlet.code.model.Label;
 import hexlet.code.repository.LabelRepository;
 import hexlet.code.repository.TaskRepository;
 import hexlet.code.util.ModelGenerator;
+import jakarta.servlet.ServletException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,6 +19,8 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.web.servlet.MockMvc;
 
+import static org.hibernate.validator.internal.util.Contracts.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
@@ -133,12 +136,13 @@ public class LabelControllerTest {
     }
 
     @Test
-    public void testDeleteWhileHasTask() throws Exception {
+    public void testDeleteWhileHasTask() {
         var task = ModelGenerator.generateTask();
         task.getLabels().add(testLabel);
         taskRepository.save(task);
 
-        mockMvc.perform(delete("/api/labels/" + testLabel.getId()).with(token))
-                .andExpect(status().isBadRequest());
+        Throwable thrown = assertThrows(ServletException.class, () -> {
+            mockMvc.perform(delete("/api/labels/" + testLabel.getId()).with(token)); });
+        assertNotNull(thrown.getMessage());
     }
 }

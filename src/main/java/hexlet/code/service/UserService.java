@@ -7,9 +7,7 @@ import hexlet.code.mapper.UserMapper;
 import hexlet.code.repository.TaskRepository;
 import hexlet.code.repository.UserRepository;
 import lombok.AllArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -48,11 +46,6 @@ public class UserService {
     }
 
     public void delete(Long id) {
-        var user = userRepository.findById(id);
-        if (user.isPresent() && taskRepository.findByAssigneeEmail(user.get().getEmail()).isPresent()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Can Not Delete While User Has Task");
-        } else {
-            userRepository.deleteById(id);
-        }
+        userRepository.deleteById(id);
     }
 }

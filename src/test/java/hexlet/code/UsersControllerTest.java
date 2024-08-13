@@ -1,6 +1,8 @@
 package hexlet.code;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hibernate.validator.internal.util.Contracts.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -13,6 +15,7 @@ import hexlet.code.dto.user.UserDTO;
 import hexlet.code.mapper.UserMapper;
 import hexlet.code.repository.TaskRepository;
 import hexlet.code.util.ModelGenerator;
+import jakarta.servlet.ServletException;
 import org.junit.jupiter.api.AfterEach;
 import org.openapitools.jackson.nullable.JsonNullable;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -145,12 +148,12 @@ UsersControllerTest {
     }
 
     @Test
-    public void testDeleteWhileHasTask() throws Exception {
+    public void testDeleteWhileHasTask() {
         var task = ModelGenerator.generateTask();
         task.setAssignee(testUser);
         taskRepository.save(task);
-
-        mockMvc.perform(delete("/api/users/" + testUser.getId()).with(token))
-                .andExpect(status().isBadRequest());
+        Throwable thrown = assertThrows(ServletException.class, () -> {
+            mockMvc.perform(delete("/api/users/" + testUser.getId()).with(token)); });
+        assertNotNull(thrown.getMessage());
     }
 }

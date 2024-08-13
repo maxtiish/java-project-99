@@ -12,8 +12,13 @@ import jakarta.persistence.EntityListeners;
 import jakarta.persistence.Id;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Column;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.CascadeType;
+
 
 import java.time.LocalDate;
+import java.util.Set;
 
 import static jakarta.persistence.GenerationType.IDENTITY;
 
@@ -34,4 +39,7 @@ public class Label {
 
     @CreatedDate
     private LocalDate createdAt;
+
+    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "labels", cascade = CascadeType.MERGE)
+    private Set<Task> tasks;
 }

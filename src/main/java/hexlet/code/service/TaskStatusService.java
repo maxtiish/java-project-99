@@ -7,9 +7,7 @@ import hexlet.code.mapper.TaskStatusMapper;
 import hexlet.code.repository.TaskRepository;
 import hexlet.code.repository.TaskStatusRepository;
 import lombok.AllArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -48,10 +46,6 @@ public class TaskStatusService {
     }
 
     public void delete(Long id) {
-        var status = statusRepository.findById(id);
-        if (status.isPresent() && taskRepository.findByTaskStatusName(status.get().getName()).isPresent()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Can Not Delete While Status Has Task");
-        }
         statusRepository.deleteById(id);
     }
 }
